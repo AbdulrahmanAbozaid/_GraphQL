@@ -4,11 +4,24 @@ require("dotenv").config();
 const expressGraphQL = require("express-graphql");
 const { GraphQLSchema } = require("graphql");
 const RootQueryType = require("./graphql/rootObject");
+const connection = require("./db.connection");
+const cors = require("cors");
 
 const schema = new GraphQLSchema({
   query: RootQueryType,
 });
 
+// MidWare
+connection();
+app.use(
+  cors({
+    origin: "*",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: "*",
+  })
+);
+// -- GraphQL Endpoint
 app.use(
   "/",
   expressGraphQL({
@@ -17,4 +30,4 @@ app.use(
   })
 );
 
-app.listen(process.env.PORT, () => console.log("Server is up and running!"));
+module.exports = app;
