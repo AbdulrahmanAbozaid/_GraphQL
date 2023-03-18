@@ -133,9 +133,10 @@ userSchema.pre("save", async function (next) {
 ```
 
 4. \_Book and User
-   1. Book
 
-`````JS
+- Book
+
+```JS
 const BookType = new GraphQLObjectType({
   name: "book",
   description: "This is a book object",
@@ -161,10 +162,9 @@ const BookType = new GraphQLObjectType({
 });
 ```
 
-```
+- User
 
-    2. User
-````JS
+```JS
 const UserType = new GraphQLObjectType({
   name: "user",
   description: "This is a user object",
@@ -194,7 +194,7 @@ const UserType = new GraphQLObjectType({
     },
   }),
 });
-`````
+```
 
 5. _Book and User Mutations_
 
@@ -406,4 +406,8 @@ const BookQueryType = new GraphQLObjectType({
     },
   }),
 });
+```
+
+```
+
 ```
