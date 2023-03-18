@@ -4,19 +4,19 @@ const {
   GraphQLNonNull: NonNull,
   GraphQLInt: Int,
   GraphQLString: String,
+  GraphQLID: ID,
 } = require("graphql");
 
-/**(name - title - numOfPages - userId) */
 const BookType = new GraphQLObjectType({
   name: "book",
   description: "This is a book object",
   fields: () => ({
     id: {
-      type: NonNull(Int),
+      type: NonNull(ID),
       description: "book id",
     },
     userId: {
-      type: NonNull(Int),
+      type: NonNull(ID),
       description: "user id",
     },
     name: {

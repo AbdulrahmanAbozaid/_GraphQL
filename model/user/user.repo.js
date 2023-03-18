@@ -14,7 +14,7 @@ exports.list = async () => {
 // CREATE
 
 exports.create = async (form) => {
-  let found = await this.get({ email: body.email });
+  let found = await this.get({ email: form.email });
   if (!found.success) {
     let user = new User(form);
     await user.save();
@@ -54,9 +54,9 @@ exports.delete = async (id) => {
 // UPDATE
 
 exports.update = async (id, form) => {
-  let found = await this.getById(id);
-  if (found.success) {
-    let user = await User.findByIdAndUpdate(id, form);
+  await User.findByIdAndUpdate(id, form);
+  let { user } = await this.getById(id);
+  if (user) {
     return {
       code: 200,
       success: true,

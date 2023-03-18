@@ -1,35 +1,35 @@
 const Book = require("./book.model");
+const User = require("../user/user.model");
 
 // LIST
 
-exports.list = async () => {
-  let users = await User.find({});
+exports.list = async (filter, paginated) => {
+  let books;
+  if (paginated?.page && paginated?.limit) {
+    books = await Book.find({ ...filter })
+      .skip((+paginated.page - 1) * paginated.limit)
+      .limit(paginated.limit);
+  } else {
+    books = await Book.find({ ...filter });
+  }
   return {
     code: 200,
     success: true,
-    users,
+    books,
   };
 };
 
 // CREATE
 
 exports.create = async (form) => {
-  let found = await this.get({ email: body.email });
-  if (!found.success) {
-    let user = new User(form);
-    await user.save();
-    return {
-      code: 200,
-      success: true,
-      user,
-    };
-  } else {
-    return {
-      code: 400,
-      success: false,
-      error: "User Already Exists",
-    };
-  }
+  let book = new Book(form);
+  await book.save();
+  await User.findByIdAndUpdate(form.userId, { $push: { books: book._id } });
+  return {
+    code: 200,
+    success: true,
+    book,
+  };
 };
 
 // DELETE
@@ -37,7 +37,10 @@ exports.create = async (form) => {
 exports.delete = async (id) => {
   let found = await this.getById(id);
   if (found.success) {
-    await User.findByIdAndDelete(id);
+    await Book.findByIdAndDelete(id);
+    await User.findByIdAndUpdate(found.book.userId, {
+      $pull: { books: found.book._id },
+    });
     return {
       code: 200,
       success: true,
@@ -46,7 +49,7 @@ exports.delete = async (id) => {
     return {
       code: 404,
       success: false,
-      error: "User Not Found!",
+      error: "Book Not Found!",
     };
   }
 };
@@ -54,19 +57,19 @@ exports.delete = async (id) => {
 // UPDATE
 
 exports.update = async (id, form) => {
-  let found = await this.getById(id);
-  if (found.success) {
-    let user = await User.findByIdAndUpdate(id, form);
+  await Book.findByIdAndUpdate(id, form);
+  let { book } = await this.getById(id);
+  if (book) {
     return {
       code: 200,
       success: true,
-      user,
+      book,
     };
   } else {
     return {
       code: 404,
       success: false,
-      error: "User Not Found!",
+      error: "book Not Found!",
     };
   }
 };
@@ -74,37 +77,37 @@ exports.update = async (id, form) => {
 // GET_BY_ID
 
 exports.getById = async (id) => {
-  let user = await User.findById(id);
-  if (user) {
+  let book = await Book.findById(id);
+  if (book) {
     return {
       code: 200,
       success: true,
-      user,
+      book,
     };
   } else {
     return {
       code: 404,
       success: false,
-      error: "User Not Found!",
+      error: "Book Not Found!",
     };
   }
 };
 
-// GET_RECORD
+// GET_RECORDS
 
 exports.get = async (filter) => {
-  let user = await User.findOne(filter);
-  if (user) {
+  let book = await Book.findOne(filter);
+  if (book) {
     return {
       code: 200,
       success: true,
-      user,
+      book,
     };
   } else {
     return {
       code: 404,
       success: false,
-      error: "User Not Found!",
+      error: "Book Not Found!",
     };
   }
 };
@@ -113,10 +116,10 @@ exports.get = async (filter) => {
 
 exports.getPaginated = async (page = 1, size = 5) => {
   let skipped = (+page - 1) * size;
-  let users = await User.find({}).skip(skipped).limit(size);
+  let books = await Book.find({}).skip(skipped).limit(size);
   return {
     code: 200,
     success: true,
-    users,
+    books,
   };
 };

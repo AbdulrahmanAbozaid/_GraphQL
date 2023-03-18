@@ -4,14 +4,17 @@ const {
   GraphQLNonNull: NonNull,
   GraphQLInt: Int,
   GraphQLString: String,
+  GraphQLID: ID,
 } = require("graphql");
+const BookType = require("../books/bookType");
+const bookRepo = require("../../model/book/book.repo");
 
 const UserType = new GraphQLObjectType({
   name: "user",
   description: "This is a user object",
   fields: () => ({
     id: {
-      type: NonNull(Int),
+      type: NonNull(ID),
       description: "userID",
     },
     name: {
@@ -25,6 +28,13 @@ const UserType = new GraphQLObjectType({
     },
     address: {
       type: NonNull(String),
+    },
+    books: {
+      type: List(BookType),
+      resolve: async (user) => {
+        let { books } = await bookRepo.list({ userId: user.id });
+        return books;
+      },
     },
   }),
 });
