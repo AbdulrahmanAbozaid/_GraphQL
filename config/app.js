@@ -1,14 +1,15 @@
 const express = require("express");
 const app = express();
 require("dotenv").config();
-const expressGraphQL = require("express-graphql");
+const { graphqlHTTP } = require("express-graphql");
 const { GraphQLSchema } = require("graphql");
-const RootQueryType = require("../graphql/rootObject");
+const { RootQueryType, RootMutationType } = require("../graphql/rootObject");
 const connection = require("./db.connection");
 const cors = require("cors");
 
 const schema = new GraphQLSchema({
   query: RootQueryType,
+  mutation: RootMutationType,
 });
 
 // MidWare
@@ -24,7 +25,7 @@ app.use(
 // -- GraphQL Endpoint
 app.use(
   "/",
-  expressGraphQL({
+  graphqlHTTP({
     graphiql: true,
     schema,
   })
